@@ -71,20 +71,32 @@ for message in st.session_state.messages:
                 columns=message["columns"]
             )
 
-            for column in df.select_dtypes(include="object").columns:
-                df[column] = (
-                    df[column]
-                    .str.replace("_", " ", regex=False)
-                    .str.title()
-                )
+            df.columns = [
+                f"{column}_{index}"
+                if column in df.columns[:index]
+                else column
+                for index, column in enumerate(df.columns)
+            ]
+
+            for column_index in range(len(df.columns)):
+                if df.dtypes.iloc[column_index] == "object":
+                    series = df.iloc[:, column_index].astype(str)
+
+                    df.isetitem(
+                        column_index,
+                        series.str.replace("_", " ", regex=False).str.title()
+                    )
 
             float_columns = df.select_dtypes(include="float").columns
 
-            st.dataframe(
-                df.style.format(
-                    {column: "{:.2f}" for column in float_columns}
+            if len(df) > 1000:
+                st.dataframe(df)
+            else:
+                st.dataframe(
+                    df.style.format(
+                        {column: "{:.2f}" for column in float_columns}
+                    )
                 )
-            )
 
             if len(df.columns) == 2 and len(df) > 1:
                 generate_chart(df)
@@ -100,9 +112,13 @@ if question:
         "content": question
     })
 
+    with st.chat_message("user"):
+        st.markdown(question)
+
     try:
         with st.spinner("Analyzing your question..."):
             answer, results, columns = ask_database(question)
+
 
             st.session_state.messages.append({
                 "role": "assistant",
@@ -125,28 +141,32 @@ if question:
 
             df = pd.DataFrame(results, columns=columns)
 
-            for column in df.select_dtypes(include="object").columns:
-                df[column] = (
+            df.columns = [
+                f"{column}_{index}"
+                if column in df.columns[:index]
+                else column
+                for index, column in enumerate(df.columns)
+            ]
 
-                    df[column]
+            for column_index in range(len(df.columns)):
+                if df.dtypes.iloc[column_index] == "object":
+                    series = df.iloc[:, column_index].astype(str)
 
-                    .str.replace("_", " ", regex=False)
-
-                    .str.title()
-
-                )
+                    df.isetitem(
+                        column_index,
+                        series.str.replace("_", " ", regex=False).str.title()
+                    )
 
             float_columns = df.select_dtypes(include="float").columns
 
-            st.dataframe(
-
-                df.style.format(
-
-                    {column: "{:.2f}" for column in float_columns}
-
+            if len(df) > 1000:
+                st.dataframe(df)
+            else:
+                st.dataframe(
+                    df.style.format(
+                        {column: "{:.2f}" for column in float_columns}
+                    )
                 )
-
-            )
 
             if len(df.columns) == 2 and len(df) > 1:
                 generate_chart(df)

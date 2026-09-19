@@ -11,6 +11,10 @@ Instead of writing SQL queries manually, users can simply ask questions such as:
 
 The system uses a Gemini LLM to convert natural-language questions into SQL queries, executes the validated queries against a SQLite database, and presents the results through conversational responses, tables, and automatic visualizations.
 
+## 📸 Application Preview
+
+![AI Business Intelligence Assistant](screenshots/app.png)
+
 ## ✨ Features
 
 - 💬 Natural-language conversational interface
@@ -162,3 +166,4 @@ GEMINI_API_KEY=your_api_key_here
 - Google Gemini for the large language model used for natural-language understanding, SQL generation, and result explanation.
 - Olist Brazilian E-Commerce Public Dataset for the e-commerce data used in this project.
 - Streamlit for the application interface and visualization framework.
+

@@ -127,37 +127,45 @@ if question:
                 "columns": columns
             })
 
+
     except Exception:
+
         st.error(
-                "⚠️ I couldn't process your question. "
-                "Please try rephrasing it."
-            )
 
-    with st.chat_message("assistant"):
+            "⚠️ I couldn't process your question. "
 
-        st.markdown(answer)
+            "Please try rephrasing it."
 
-        if results:
+        )
 
-            df = pd.DataFrame(results, columns=columns)
 
-            df.columns = [
-                f"{column}_{index}"
-                if column in df.columns[:index]
-                else column
-                for index, column in enumerate(df.columns)
-            ]
+    else:
 
-            for column_index in range(len(df.columns)):
-                if df.dtypes.iloc[column_index] == "object":
-                    series = df.iloc[:, column_index].astype(str)
+        with st.chat_message("assistant"):
 
-                    df.isetitem(
-                        column_index,
-                        series.str.replace("_", " ", regex=False).str.title()
-                    )
+            st.markdown(answer)
 
-            float_columns = df.select_dtypes(include="float").columns
+            if results:
+
+                df = pd.DataFrame(results, columns=columns)
+
+                df.columns = [
+                    f"{column}_{index}"
+                    if column in df.columns[:index]
+                    else column
+                    for index, column in enumerate(df.columns)
+                ]
+
+                for column_index in range(len(df.columns)):
+                    if df.dtypes.iloc[column_index] == "object":
+                        series = df.iloc[:, column_index].astype(str)
+
+                        df.isetitem(
+                            column_index,
+                            series.str.replace("_", " ", regex=False).str.title()
+                        )
+
+                float_columns = df.select_dtypes(include="float").columns
 
             if len(df) > 1000:
                 st.dataframe(df)

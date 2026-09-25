@@ -17,8 +17,12 @@ def generate_response(prompt, model="gemini-flash-lite-latest"):
 
             return response.text
 
+
         except Exception as error:
+
             print(f"Gemini request failed. Attempt {attempt + 1}/3")
+
+
 
             if attempt < 2:
                 time.sleep(2)
